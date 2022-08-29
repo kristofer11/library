@@ -11,23 +11,6 @@
         <h3>Library App</h3>
         <p>This project was completed as part of The Odin Project's Javascript Course</p>
 
-        <div class="form-div">
-            <form action="">
-                <label for="title">Title
-                    <input type="text" id="title">
-                </label>
-                <label for="author">Author
-                    <input type="text" id="author">
-                </label>
-                <label for="" class="read">
-                    <input type="checkbox" name="read" id="read"> Have you read this book?
-                </label>
-                <label for="submit"> 
-                    <input type="submit" value="Add Book">
-                </label>
-            </form>
-        </div>
-
         <div class="library">
             <div class="library-title">
                 <h1>My Library</h1>
@@ -37,29 +20,73 @@
             </div>
 
         </div>
+        <div class="modal" id="modal">
+            <div class="modal-content">
+                <span class="close">X</span>
+                <div class="modal-form">
+                    <h1 class="form-title">Add Book</h1>
+                    <form class="add-book-form">
+                        <div class="modal-input-field">
+                            <label for="book-title">Title:</label>
+                            <input 
+                            type="text" 
+                            name="book-title"
+                            class="modal-form-input" 
+                            id="book-title">
+                        </div>
+                        <div class="modal-input-field">
+                            <label for="book-author">Author:</label>
+                            <input 
+                            type="text" 
+                            name="book-author"
+                            class="modal-form-input" 
+                            id="book-author">
+                        </div>
+                        <div class="modal-input-field">
+                            <label for="book-pages">Pages:</label>
+                            <input 
+                            type="number"
+                            min="0" 
+                            name="book-pages"
+                            class="modal-form-input" 
+                            id="book-pages">
+                        </div>
+                        <div class="modal-input-field">
+                            <span class="modal-read">Read?</span>
+                            <label class='container' for="book-read">
+                                <input 
+                                type="checkbox"
+                                name="book-read"
+                                class="checkmark" 
+                                id="book-read">                                
+                            </label>
+                        </div>
+                        <div class="submit-modal-form">
+                            <button type="submit" class="btn form-button">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
         const books = document.querySelector('.books');
 
-        let myLibrary = [
-            // {
-            //     title: "The Lord of the Rings",
-            //     author: "Tolkien",
-            //     pages: 900,
-            //     read: true,
-            // },
-            // {
-            //     title: "book1",
-            //     author: "me",
-            //     pages: 111,
-            //     read: false
-            // }
-        ];
+        function Book(title, author, pages, read) {
+            this.title = title,
+            this.author = author,
+            this.pages = pages,
+            this.id = Math.floor(Math.random() * 100000000000);
+        }
 
-        function addLocalStorage() {
-            localStorage.setItem('library', JSON.stringify([
-                {
+        function addBookToLibrary(title, author, pages, read) {
+            myLibrary.push(new Book(title, author, pages, read))
+            saveAndRenderBooks();
+        }
+
+        let myLibrary = [
+            {
                 title: "The Lord of the Rings",
                 author: "Tolkien",
                 pages: 900,
@@ -70,9 +97,27 @@
                 author: "me",
                 pages: 111,
                 read: false
-            }]))
+            }
+        ];
+
+        function addLocalStorage() {
+            // localStorage.setItem(
+            //     'library', 
+            //     JSON.stringify([
+            //     {
+            //     title: "The Lord of the Rings",
+            //     author: "Tolkien",
+            //     pages: 900,
+            //     read: true,
+            // },
+            // {
+            //     title: "book1",
+            //     author: "me",
+            //     pages: 111,
+            //     read: false
+            // }]))
             myLibrary = JSON.parse(localStorage.getItem('library')) //[]
-            renderBooks();
+            saveAndRenderBooks();
         }
 
         // function Book(title, author, pages, read) {
@@ -103,11 +148,11 @@
                 if(e.target.checked) {
                     bookItem.setAttribute('class', 'read-checked')
                     book.read = true
-                    renderBooks()
+                    saveAndRenderBooks()
                 } else {
                     bookItem.setAttribute('class', 'read-unchecked')
                     book.read = false;
-                    renderBooks();
+                    saveAndRenderBooks();
                 }
             })
                 if(book.read) {
@@ -120,9 +165,26 @@
 
         function deleteBook(index) {
             myLibrary.splice(index,1)
-            renderBooks();
+            saveAndRenderBooks();
         }
 
+        const addBookForm = document.querySelector(".add-book-form")
+        addBookForm.addEventListener('submit', (e) => {
+            e.preventDefault()
+
+            const data = new FormData(e.target)
+            let newBook = {}
+            for(let [name,value] of data)
+                if(name === 'book-read'){
+                    newBook['book-read'] = true;
+                } else {
+                    newBook[name] = value;
+                }
+            if(!newBook['book-read']) {
+                newBook['book-read'] = false;
+            }
+            addBookToLibrary(newBook['boook-title'], newBook['boook-author'], newBook['boook-pages'], newBook['boook-read'])
+        })
 
 
         function createBookItem(book, index) {
@@ -149,6 +211,10 @@
             });
         }
 
+        function saveAndRenderBooks() {
+            localStorage.setItem('library', JSON.stringify(myLibrary));
+            renderBooks();
+        }
 
         //not sure if I am going to use this constructor
         // const theHobbit = new Book("The Hobbit", "Tolkien", 899, true);

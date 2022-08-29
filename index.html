@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library App</title>
+</head>
+<body>
+    <main>
+        <h3>Library App</h3>
+        <p>This project was completed as part of The Odin Project's Javascript Course</p>
+
+        <div class="form-div">
+            <form action="">
+                <label for="title">Title
+                    <input type="text" id="title">
+                </label>
+                <label for="author">Author
+                    <input type="text" id="author">
+                </label>
+                <label for="" class="read">
+                    <input type="checkbox" name="read" id="read"> Have you read this book?
+                </label>
+                <label for="submit"> 
+                    <input type="submit" value="Add Book">
+                </label>
+            </form>
+        </div>
+
+        <div class="library">
+            <div class="library-title">
+                <h1>My Library</h1>
+            </div>
+            <div class="books">
+
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const books = document.querySelector('.books');
+
+        let myLibrary = [
+            // {
+            //     title: "The Lord of the Rings",
+            //     author: "Tolkien",
+            //     pages: 900,
+            //     read: true,
+            // },
+            // {
+            //     title: "book1",
+            //     author: "me",
+            //     pages: 111,
+            //     read: false
+            // }
+        ];
+
+        function addLocalStorage() {
+            localStorage.setItem('library', JSON.stringify([
+                {
+                title: "The Lord of the Rings",
+                author: "Tolkien",
+                pages: 900,
+                read: true,
+            },
+            {
+                title: "book1",
+                author: "me",
+                pages: 111,
+                read: false
+            }]))
+            myLibrary = JSON.parse(localStorage.getItem('library')) //[]
+            renderBooks();
+        }
+
+        // function Book(title, author, pages, read) {
+        //     this.title = title
+        //     this.author = author
+        //     this.pages = pages
+        //     this.read = read
+        // };
+
+        function addBook(book) {
+            myLibrary.push(book)
+        };
+
+        function createBookElement(el, content, className) {
+            const element = document.createElement(el);
+            element.textContent = content;
+            element.setAttribute("class", className);
+            return element;
+        }
+
+        function createReadElement(bookItem, book) {
+            const read = document.createElement('div');
+            read.setAttribute('class', 'book-read');
+            read.appendChild(createBookElement('h1', 'Read?', "book-read-title"));
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.addEventListener('click', (e) => {
+                if(e.target.checked) {
+                    bookItem.setAttribute('class', 'read-checked')
+                    book.read = true
+                    renderBooks()
+                } else {
+                    bookItem.setAttribute('class', 'read-unchecked')
+                    book.read = false;
+                    renderBooks();
+                }
+            })
+                if(book.read) {
+                    input.checked = true;
+                    bookItem.setAttribute('class', 'read-checked');
+                }
+            read.appendChild(input)
+            return read;
+        }
+
+        function deleteBook(index) {
+            myLibrary.splice(index,1)
+            renderBooks();
+        }
+
+
+
+        function createBookItem(book, index) {
+            const bookItem = document.createElement('div');
+            bookItem.setAttribute('id', index);
+            bookItem.setAttribute('key', index);
+            bookItem.setAttribute('class', 'card book');
+            bookItem.appendChild(createBookElement('h1', `Title: ${book.title}`, "book-title"));
+            bookItem.appendChild(createBookElement('h1', `Author: ${book.author}`, "book-author"));
+            bookItem.appendChild(createBookElement('h1', `Pages: ${book.pages}`, "book-pages"));
+            books.insertAdjacentElement('afterbegin', bookItem);
+            bookItem.appendChild(createBookElement('button', 'X', 'delete'))
+
+            bookItem.querySelector('.delete').addEventListener('click', () => {
+                deleteBook(index)
+            });
+            bookItem.appendChild(createReadElement(bookItem, book));
+        };
+
+        function renderBooks() {
+            books.textContent = "";
+            myLibrary.map((book, index) => {
+                createBookItem(book, index);
+            });
+        }
+
+
+        //not sure if I am going to use this constructor
+        // const theHobbit = new Book("The Hobbit", "Tolkien", 899, true);
+
+        // addBook(theHobbit);
+
+        //Render on page load
+        addLocalStorage();
+
+
+
+    </script>
+</body>
+</html>

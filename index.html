@@ -4,227 +4,133 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library App</title>
+    <title>MyBookList</title>
+    <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
 </head>
 <body>
-    <main>
-        <h3>Library App</h3>
-        <p>This project was completed as part of The Odin Project's Javascript Course</p>
 
-        <div class="library">
-            <div class="library-title">
-                <h1>My Library</h1>
+    <!-- Referred to Traversy Media's YouTube video in completing this Odin Project assignment -->
+    <div class="container mt-4"></div>
+    <h1 class="display-4 text-center">
+        <span style="font-size: 4rem;" class="material-symbols-outlined text-success">
+        bookmark
+        </span> 
+        My<span class="text-warning">Book</span>List</h1>
+        <form id="book-form">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" class="form-control">
             </div>
-            <div class="books">
+            <div class="form-group">
+                <label for="author">Author</label>
+                <input type="text" id="author" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="pages">pages</label>
+                <input type="number" id="pages" class="form-control">
+            </div>
+            <input type="submit" value="Add Book" class="btn btn-primary btn-block">
+        </form>
 
-            </div>
+        <table class="table table-striped mt-5">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Pages</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="book-list"></tbody>
+        </table>
 
-        </div>
-        <div class="modal" id="modal">
-            <div class="modal-content">
-                <span class="close">X</span>
-                <div class="modal-form">
-                    <h1 class="form-title">Add Book</h1>
-                    <form class="add-book-form">
-                        <div class="modal-input-field">
-                            <label for="book-title">Title:</label>
-                            <input 
-                            type="text" 
-                            name="book-title"
-                            class="modal-form-input" 
-                            id="book-title">
-                        </div>
-                        <div class="modal-input-field">
-                            <label for="book-author">Author:</label>
-                            <input 
-                            type="text" 
-                            name="book-author"
-                            class="modal-form-input" 
-                            id="book-author">
-                        </div>
-                        <div class="modal-input-field">
-                            <label for="book-pages">Pages:</label>
-                            <input 
-                            type="number"
-                            min="0" 
-                            name="book-pages"
-                            class="modal-form-input" 
-                            id="book-pages">
-                        </div>
-                        <div class="modal-input-field">
-                            <span class="modal-read">Read?</span>
-                            <label class='container' for="book-read">
-                                <input 
-                                type="checkbox"
-                                name="book-read"
-                                class="checkmark" 
-                                id="book-read">                                
-                            </label>
-                        </div>
-                        <div class="submit-modal-form">
-                            <button type="submit" class="btn form-button">Submit</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </main>
 
     <script>
-        const books = document.querySelector('.books');
-
-        function Book(title, author, pages, read) {
-            this.title = title,
-            this.author = author,
-            this.pages = pages,
-            this.id = Math.floor(Math.random() * 100000000000);
-        }
-
-        function addBookToLibrary(title, author, pages, read) {
-            myLibrary.push(new Book(title, author, pages, read))
-            saveAndRenderBooks();
-        }
-
-        let myLibrary = [
-            {
-                title: "The Lord of the Rings",
-                author: "Tolkien",
-                pages: 900,
-                read: true,
-            },
-            {
-                title: "book1",
-                author: "me",
-                pages: 111,
-                read: false
+        //book class here
+        class Book {
+            constructor(title, author, pages) {
+                this.title = title;
+                this.author = author;
+                this.pages = pages;
             }
-        ];
-
-        function addLocalStorage() {
-            // localStorage.setItem(
-            //     'library', 
-            //     JSON.stringify([
-            //     {
-            //     title: "The Lord of the Rings",
-            //     author: "Tolkien",
-            //     pages: 900,
-            //     read: true,
-            // },
-            // {
-            //     title: "book1",
-            //     author: "me",
-            //     pages: 111,
-            //     read: false
-            // }]))
-            myLibrary = JSON.parse(localStorage.getItem('library')) //[]
-            saveAndRenderBooks();
         }
 
-        // function Book(title, author, pages, read) {
-        //     this.title = title
-        //     this.author = author
-        //     this.pages = pages
-        //     this.read = read
-        // };
-
-        function addBook(book) {
-            myLibrary.push(book)
-        };
-
-        function createBookElement(el, content, className) {
-            const element = document.createElement(el);
-            element.textContent = content;
-            element.setAttribute("class", className);
-            return element;
-        }
-
-        function createReadElement(bookItem, book) {
-            const read = document.createElement('div');
-            read.setAttribute('class', 'book-read');
-            read.appendChild(createBookElement('h1', 'Read?', "book-read-title"));
-            const input = document.createElement('input');
-            input.type = 'checkbox';
-            input.addEventListener('click', (e) => {
-                if(e.target.checked) {
-                    bookItem.setAttribute('class', 'read-checked')
-                    book.read = true
-                    saveAndRenderBooks()
-                } else {
-                    bookItem.setAttribute('class', 'read-unchecked')
-                    book.read = false;
-                    saveAndRenderBooks();
-                }
-            })
-                if(book.read) {
-                    input.checked = true;
-                    bookItem.setAttribute('class', 'read-checked');
-                }
-            read.appendChild(input)
-            return read;
-        }
-
-        function deleteBook(index) {
-            myLibrary.splice(index,1)
-            saveAndRenderBooks();
-        }
-
-        const addBookForm = document.querySelector(".add-book-form")
-        addBookForm.addEventListener('submit', (e) => {
-            e.preventDefault()
-
-            const data = new FormData(e.target)
-            let newBook = {}
-            for(let [name,value] of data)
-                if(name === 'book-read'){
-                    newBook['book-read'] = true;
-                } else {
-                    newBook[name] = value;
-                }
-            if(!newBook['book-read']) {
-                newBook['book-read'] = false;
+        //UI Class
+        class UI {
+            static displayBooks() {
+                const StoredBooks = [
+                    {
+                        title: "Book 1",
+                        author: "Jonathan Doe",
+                        pages: 234
+                    },
+                    {
+                        title: "Book 2",
+                        author: "Jannessa Doe",
+                        pages: 4443
+                    }
+                ];
+                const books = StoredBooks;
+                books.forEach((book) => UI.addBookToList(book));
             }
-            addBookToLibrary(newBook['boook-title'], newBook['boook-author'], newBook['boook-pages'], newBook['boook-read'])
-        })
+            static addBookToList(book) {
+                const list = document.querySelector('#book-list');
 
+                const row = document.createElement('tr');
 
-        function createBookItem(book, index) {
-            const bookItem = document.createElement('div');
-            bookItem.setAttribute('id', index);
-            bookItem.setAttribute('key', index);
-            bookItem.setAttribute('class', 'card book');
-            bookItem.appendChild(createBookElement('h1', `Title: ${book.title}`, "book-title"));
-            bookItem.appendChild(createBookElement('h1', `Author: ${book.author}`, "book-author"));
-            bookItem.appendChild(createBookElement('h1', `Pages: ${book.pages}`, "book-pages"));
-            books.insertAdjacentElement('afterbegin', bookItem);
-            bookItem.appendChild(createBookElement('button', 'X', 'delete'))
+                row.innerHTML = `
+                <td>${book.title}</td>
+                <td>${book.author}</td>
+                <td>${book.pages}</td>
+                <td><a href="#" class="btn btn-danger btn-sm delete">X</a></td>
+                `;
 
-            bookItem.querySelector('.delete').addEventListener('click', () => {
-                deleteBook(index)
-            });
-            bookItem.appendChild(createReadElement(bookItem, book));
-        };
+                list.appendChild(row);
+            }
 
-        function renderBooks() {
-            books.textContent = "";
-            myLibrary.map((book, index) => {
-                createBookItem(book, index);
-            });
+            static deleteBook(el) {
+                if(el.classList.contains('delete')) {
+                    el.parentElement.parentElement.remove();
+                }
+            }
+
+            static clearFields() {
+                document.querySelector('#title').value = '';
+                document.querySelector('#author').value = '';
+                document.querySelector('#pages').value = '';
+            }
         }
 
-        function saveAndRenderBooks() {
-            localStorage.setItem('library', JSON.stringify(myLibrary));
-            renderBooks();
-        }
+        //Display Books
+        document.addEventListener('DOMContentLoaded', UI.displayBooks)
 
-        //not sure if I am going to use this constructor
-        // const theHobbit = new Book("The Hobbit", "Tolkien", 899, true);
+        //Add a book
+        document.querySelector('#book-form').addEventListener('submit', (e) => {
+            //prevent actual submit
+            e.preventDefault();
 
-        // addBook(theHobbit);
+            //get form values
+            const title = document.querySelector('#title').value
+            const author = document.querySelector('#author').value
+            const pages = document.querySelector('#pages').value
 
-        //Render on page load
-        addLocalStorage();
+            //instantiate book
+            const book = new Book(title, author, pages);
 
+            //Add book to UI
+            UI.addBookToList(book);
 
+            //Clear fields
+            UI.clearFields();
+
+        });
+
+        //Delete a book from display
+        document.querySelector('#book-list').addEventListener('click', (e) => {
+            UI.deleteBook(e.target)
+        });
 
     </script>
 </body>
